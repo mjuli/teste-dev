@@ -1,1 +1,19 @@
-node_modules
+# compiled output
+/dist
+/build
+
+# dependencies
+/node_modules
+
+# environment
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
