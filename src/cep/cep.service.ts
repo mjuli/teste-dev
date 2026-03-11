@@ -12,6 +12,7 @@ export class CepService {
 
   async findByCep(cep: string): Promise<CepResponseDto> {
     const providers = this.providerSelector.getOrdered();
+    const errors: Error[] = [];
 
     for (const provider of providers) {
       try {
@@ -25,6 +26,8 @@ export class CepService {
       } catch (error) {
         if (error instanceof CepNotFoundError) throw error;
 
+        errors.push(error);
+
         this.logger.warn({
           message: 'Provider falhou, tentando próximo',
           provider: provider.name,
@@ -37,6 +40,11 @@ export class CepService {
       message: 'Todos os providers falharam',
       cep,
     });
-    throw new AllProvidersFailedError(cep);
+
+    const allTimedOut = errors.every((e) => e.name === 'TimeoutError');
+    throw new AllProvidersFailedError(
+      cep,
+      allTimedOut ? 'timeout' : 'unavailable',
+    );
   }
 }

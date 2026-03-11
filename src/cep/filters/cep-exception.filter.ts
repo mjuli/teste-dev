@@ -26,11 +26,15 @@ export class CepExceptionFilter implements ExceptionFilter {
     }
 
     if (error instanceof AllProvidersFailedError) {
-      this.logger.error({ message: error.message });
+      const message =
+        error.reason === 'timeout'
+          ? 'Tempo limite de resposta excedido em todos os serviços de CEP.'
+          : 'Todos os serviços de CEP estão indisponíveis no momento.';
+
       return response.status(HttpStatus.SERVICE_UNAVAILABLE).json({
         statusCode: 503,
         error: 'Service Unavailable',
-        message: 'Todos os serviços de CEP estão indisponíveis no momento',
+        message,
       });
     }
   }
